@@ -39,6 +39,8 @@ class CharVocab(Vocab):
         if c in self.c2i:
             return self.c2i[c]
 
+        print(c)
+
         return self.c2i['<unk>']
 
     def decode(self, i):
