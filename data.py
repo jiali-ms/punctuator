@@ -82,13 +82,21 @@ class Corpus(object):
         self.encoded_test = self._encode_corpus(TEST_CORPUS_PATH, debug)
 
     def _encode_corpus(self, path, debug=False):
+        if os.path.exists(path + '.pkl'):
+            print('load encoded corpus from dump: %s' % path + '.pkl')
+            data = pickle.load(open(path + '.pkl', 'rb'))
+            if debug:
+                return (data[0][:1024*100], data[1][:2014*100])
+            else:
+                return data
+
         encoded_x = []
         encoded_y = []
         print('encode corpus: {}'.format(path))
         with open(path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             if debug:
-                lines = lines[:1024*20]
+                lines = lines[:1024*100]
             for line in tqdm(lines):
                 tokens = line.strip().split(' ')
                 if isinstance(self.vocab, CharVocab):
@@ -109,14 +117,16 @@ class Corpus(object):
 
         assert len(encoded_y) == len(encoded_x)
 
+        pickle.dump((encoded_x, encoded_y), open(path + '.pkl', 'wb'))
+
         return encoded_x, encoded_y
 
 if __name__ == "__main__":
     vocab = CharVocab(100000) # 100k
-    corpus = Corpus(vocab, debug=True)
+    corpus = Corpus(vocab, debug=False)
     decoded = []
     train_x, train_y = corpus.encoded_train
-    for i in range(len(train_x)):
+    for i in range(100):
         decoded.append(vocab.decode(train_x[i]))
         if vocab.is_punctuation(train_y[i]):
             decoded.append(vocab.decode(train_y[i]))

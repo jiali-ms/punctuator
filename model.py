@@ -10,8 +10,8 @@ use_dropout = True
 
 def LSTM_Model(vocab_size, embedding_size, hidden_size, n_classes, num_steps):
     model = Sequential()
-    model.add(Embedding(vocab_size, embedding_size, input_length=num_steps, batch_input_shape=(embedding_size, num_steps)))
-    model.add(LSTM(hidden_size, return_sequences=True, stateful=True))
+    model.add(Embedding(vocab_size, embedding_size, input_length=num_steps))
+    model.add(LSTM(hidden_size, return_sequences=True, stateful=False))
     if use_dropout:
         model.add(Dropout(0.2))
     model.add(TimeDistributed(Dense(n_classes)))
