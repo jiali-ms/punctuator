@@ -18,10 +18,10 @@ original = '周囲の疑惑の目にさらされながらも、堂々と愛人�
 input = [x for x in original if x not in punc_dict]
 encoded_input = [vocab.encode(x) for x in input]
 
-print(model.predict(np.array(encoded_input).reshape((1,-1))))
-
-pred_y = np.argmax(model.predict(np.array(encoded_input).reshape((1, -1))), axis=2)
-print(pred_y)
+pred = model.predict(np.array(encoded_input).reshape((1,-1)))
+#print(pred)
+pred_y = np.argmax((pred), axis=2)
+#print(pred_y)
 
 decoded = []
 result = list(pred_y.reshape(-1))
@@ -29,6 +29,10 @@ for i in range(len(encoded_input)):
     decoded.append(vocab.decode(encoded_input[i]))
     if vocab.is_punctuation(result[i]):
         decoded.append(vocab2punc[vocab.decode(result[i])])
+    elif pred[0][i][1] > 0.1:
+        decoded.append('<c %.2f>' % pred[0][i][1])
+    elif pred[0][i][2] > 0.1:
+        decoded.append('<p %.2f>' % pred[0][i][2])
 
 print(original)
 print(''.join(decoded))
