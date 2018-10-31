@@ -14,7 +14,7 @@ output_punc = {0:vocab.decode(0), 1:vocab.decode(1), 2:vocab.decode(2)}
 vocab2punc = {'<comma>': '、', '<period>': '。'}
 punc_dict = set(['、', '。', '「', '」', '・', '）', '（', '，', '？', '！', '…', '〜', '．', '‐', '『', '』', '―', '：', '“', '”'])
 
-original = '今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です'
+original = '周囲の疑惑の目にさらされながらも、堂々と愛人と同棲し、高級外車を乗りまわしたりと、異様に神経の図太い男だったのだが…'
 input = [x for x in original if x not in punc_dict]
 encoded_input = [vocab.encode(x) for x in input]
 

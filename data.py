@@ -57,7 +57,7 @@ class CharVocab(Vocab):
 
     def __init__(self, size):
         super(CharVocab, self).__init__(size)
-        self.c2i = {'<blank>': 0, '<comma>': 1, '<period>': 2, '<unk>': 4}
+        self.c2i = {'<blank>': 0, '<comma>': 1, '<period>': 2, '<unk>': 3}
 
         for item in self.lexicon[len(self.c2i):]:
             word = item[0].split('/')[0]
