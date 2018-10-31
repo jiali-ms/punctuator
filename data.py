@@ -86,7 +86,7 @@ class Corpus(object):
             print('load encoded corpus from dump: %s' % path + '.pkl')
             data = pickle.load(open(path + '.pkl', 'rb'))
             if debug:
-                return (data[0][:1024*100], data[1][:2014*100])
+                return (data[0][:1024*1000], data[1][:2014*1000])
             else:
                 return data
 
@@ -96,7 +96,7 @@ class Corpus(object):
         with open(path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             if debug:
-                lines = lines[:1024*100]
+                lines = lines[:1024*1000]
             for line in tqdm(lines):
                 tokens = line.strip().split(' ')
                 if isinstance(self.vocab, CharVocab):

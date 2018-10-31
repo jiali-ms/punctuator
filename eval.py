@@ -4,7 +4,12 @@ from data import CharVocab, Corpus
 from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score
 import numpy as np
 
-model = load_model('weight/model.hdf5')
+model = load_model('weight/model_lstm_01_0.153277.hdf5')
+
+# specify GPU
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+
 
 # load corpus and vocab
 vocab = CharVocab(100000) # 100k
@@ -14,11 +19,11 @@ output_punc = {0:vocab.decode(0), 1:vocab.decode(1), 2:vocab.decode(2)}
 
 input = '今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です今日はいい天気です'
 
-encoded_input = [vocab.encode(x) for x in input][:20]
+encoded_input = [vocab.encode(x) for x in input]
 
-print(model.predict(np.array(encoded_input).reshape((1,20))))
+print(model.predict(np.array(encoded_input).reshape((1,-1))))
 
-print(np.argmax(model.predict(np.array(encoded_input).reshape((1,20))), axis=2))
+print(np.argmax(model.predict(np.array(encoded_input).reshape((1, -1))), axis=2))
 
 '''
 # evaluation

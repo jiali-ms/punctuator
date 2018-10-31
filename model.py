@@ -10,7 +10,7 @@ use_dropout = True
 
 def LSTM_Model(vocab_size, embedding_size, hidden_size, n_classes, num_steps):
     model = Sequential()
-    model.add(Embedding(vocab_size, embedding_size, input_length=num_steps))
+    model.add(Embedding(vocab_size, embedding_size))
     model.add(LSTM(hidden_size, return_sequences=True, stateful=False))
     if use_dropout:
         model.add(Dropout(0.2))
@@ -23,8 +23,8 @@ def LSTM_Model(vocab_size, embedding_size, hidden_size, n_classes, num_steps):
 
 def BiLSTM_Model(vocab_size, embedding_size, hidden_size, n_classes, num_steps):
     model = Sequential()
-    model.add(Embedding(vocab_size, embedding_size, input_length=num_steps))
-    model.add(Bidirectional(LSTM(hidden_size, stateful=True)))  # BiLSTM here
+    model.add(Embedding(vocab_size, embedding_size))
+    model.add(Bidirectional(LSTM(hidden_size, return_sequences=True, stateful=False)))
     if use_dropout:
         model.add(Dropout(0.2))
     model.add(TimeDistributed(Dense(n_classes)))
@@ -35,4 +35,4 @@ def BiLSTM_Model(vocab_size, embedding_size, hidden_size, n_classes, num_steps):
     return model
 
 if __name__ == "__main__":
-    LSTM_Model(10000, 256, 128, 3, 20)
+    BiLSTM_Model(10000, 256, 128, 3, 20)
