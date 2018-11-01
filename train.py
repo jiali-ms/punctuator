@@ -7,18 +7,23 @@ parser.add_argument("--embedding_size", "-es", type=int, default=256, help="embe
 parser.add_argument("--hidden_size", "-hs", type=int, default=128, help="hidden size")
 parser.add_argument("--model", "-m", type=str, default='lstm', help="type model name among 'lstm', 'bilstm'")
 parser.add_argument("--gpu", "-g", type=int, default=2, help="which gpu to use")
+parser.add_argument("--class_weight", "-cw", type=int, default=50, help="class weight for comma and period")
 args = parser.parse_args()
 
 from keras.models import Sequential
 
 from data import CharVocab, Corpus
 from util import data_generator
-from model import LSTM_Model, BiLSTM_Model
+from model import LSTM_Model, BiLSTM_Model, LSTM2Layer_Model, CLSTM, CBiLSTM
 
 from keras.callbacks import ModelCheckpoint, EarlyStopping
 from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score
 
-models ={'lstm': LSTM_Model, 'bilstm': BiLSTM_Model}
+models ={'lstm': LSTM_Model,
+         'bilstm': BiLSTM_Model,
+         '2lstm': LSTM2Layer_Model,
+         'clstm': CLSTM,
+         'cbilstm': CBiLSTM}
 
 # specify GPU
 import os
@@ -45,7 +50,7 @@ model.fit_generator(
     validation_data=data_generator(corpus.encoded_dev, args.batch_size, args.step_size, len(output_punc)),
     steps_per_epoch=len(corpus.encoded_train[0])//(args.batch_size*args.step_size),
     validation_steps=len(corpus.encoded_dev[0])//(args.batch_size*args.step_size),
-    class_weight=[1, 10, 10],  # blank comma period
+    class_weight=[1, args.class_weight, args.class_weight],  # blank comma period
     epochs=10,
     callbacks=[checkpoint, earlystop],
     shuffle=False) # We will use stateful LSTM, don't shuffle. Also, data is already shuffled before.
