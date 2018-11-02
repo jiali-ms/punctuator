@@ -35,7 +35,7 @@ corpus = Corpus(vocab, debug=False)
 output_punc = {0:vocab.decode(0), 1:vocab.decode(1), 2:vocab.decode(2)}
 
 # train with keras
-checkpoint = ModelCheckpoint('weight/model_%s_{epoch:02d}_{val_loss:02f}.hdf5' % args.model,
+checkpoint = ModelCheckpoint('weight/model_%s_{epoch:02d}_{val_loss:02f}.h5' % args.model,
                              verbose=1, save_best_only=True, mode='auto')
 
 earlystop = EarlyStopping(patience=1)

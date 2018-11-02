@@ -1,50 +1,46 @@
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--model", "-m", type=str, default='model_bilstm_10_0.086493.hdf5', help="the model to use in evaluation")
+parser.add_argument("--batch_size", "-bs", type=int, default=512, help="batch size")
+parser.add_argument("--step_size", "-ts", type=int, default=40, help="step size")
+args = parser.parse_args()
+
+import os
 from keras.models import load_model
-from util import data_generator
+from util import data_generator, generator_y_true
 from data import CharVocab, Corpus
 from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score
 import numpy as np
 
-model = load_model('weight/model.hdf5')
+model = load_model(os.path.join('weight', args.model))
 
 # load corpus and vocab
 vocab = CharVocab(100000) # 100k
-#corpus = Corpus(vocab, debug=True)
+corpus = Corpus(vocab, debug=False)
+encoded_test = corpus.encoded_test
+# encoded_test = ([10]*2000, [0] * 2000)
+
 output_punc = {0:vocab.decode(0), 1:vocab.decode(1), 2:vocab.decode(2)}
 
-vocab2punc = {'<comma>': '、', '<period>': '。'}
-punc_dict = set(['、', '。', '「', '」', '・', '）', '（', '，', '？', '！', '…', '〜', '．', '‐', '『', '』', '―', '：', '“', '”'])
-
-original = '周囲の疑惑の目にさらされながらも、堂々と愛人と同棲し、高級外車を乗りまわしたりと、異様に神経の図太い男だったのだが…'
-input = [x for x in original if x not in punc_dict]
-encoded_input = [vocab.encode(x) for x in input]
-
-pred = model.predict(np.array(encoded_input).reshape((1,-1)))
-#print(pred)
-pred_y = np.argmax((pred), axis=2)
-#print(pred_y)
-
-decoded = []
-result = list(pred_y.reshape(-1))
-for i in range(len(encoded_input)):
-    decoded.append(vocab.decode(encoded_input[i]))
-    if vocab.is_punctuation(result[i]):
-        decoded.append(vocab2punc[vocab.decode(result[i])])
-    elif pred[0][i][1] > 0.1:
-        decoded.append('<c %.2f>' % pred[0][i][1])
-    elif pred[0][i][2] > 0.1:
-        decoded.append('<p %.2f>' % pred[0][i][2])
-
-print(original)
-print(''.join(decoded))
-
-'''
 # evaluation
-y_pred = model.predict_generator(data_generator(corpus.encoded_test, 1, 20, len(output_punc)), 20).reshape(-1, 3).argmax(axis=1)
-y_true = corpus.encoded_test[1][:len(y_pred)]
+y_pred = model.predict_generator(data_generator(encoded_test, args.batch_size, args.step_size, len(output_punc)),
+                                 len(encoded_test[0])//(args.batch_size * args.step_size),
+                                 verbose=1)
+
+y_true = list(np.array(generator_y_true(encoded_test, args.batch_size, args.step_size, len(output_punc))).reshape(-1))
+y_pred = list(y_pred.reshape(-1, 3).argmax(axis=1))
+
+print(len(y_pred))
+print(y_pred[:100])
+
+print(len(y_true))
+print(y_true[:100])
+
+assert len(y_true)== len(y_pred)
 
 target_names = ['Blank', 'Comma', 'Period']
 print('Confusion Matrix')
 print(confusion_matrix(y_true, y_pred))
 print("classification report")
 print(classification_report(y_true, y_pred, target_names=target_names))
-'''

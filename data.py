@@ -88,7 +88,7 @@ class Corpus(object):
             print('load encoded corpus from dump: %s' % path + '.pkl')
             data = pickle.load(open(path + '.pkl', 'rb'))
             if debug:
-                return (data[0][:1024*1000], data[1][:2014*1000])
+                return (data[0][:1024*1000], data[1][:1024*1000])
             else:
                 return data
 
